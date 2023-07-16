@@ -108,7 +108,8 @@ if __name__ == '__main__':
     
     # we will use the returned players dict to create the visualisation 
 
+    # TODO: when using full data instead of summary, create multiple charts for each subcategory
     createChart(players)
-    # print(json.dumps(players))
+
 
 
