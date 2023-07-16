@@ -2,7 +2,8 @@ from time import sleep
 import requests
 from bs4 import BeautifulSoup
 from scouting import * 
-
+from visualisation import *
+import json
 baseURL = "https://fbref.com"
 allPlayerURLs = []
 players = {}
@@ -22,21 +23,27 @@ def scoutingReport(url):
 
     soup = BeautifulSoup(response.content,'html.parser')
     
-    summary = soup.find('div',id='all_scout_summary')
-    full = soup.find('div',id='all_scout_full')
+    
 
-    if summary == None :
-        return(f"No Summary scouting Report Available for {url.split('/')[-1]}")
-    else:
-        # summaryTable = getScoutingTables(summary)
-        summaryTable = "Summary!!!!!!!!!!"
-    if full == None:
-        return(f"No Full scouting Report Available for {url.split('/')[-1]}")
-    else:
-        # fullTable = getScoutingTables(full)
-        fullTable = "FullTable!!!!!!!!"
+    print("###############################")
+    choice = int(input("Would you like  summary scouting (0) or full scouting report (1)? "))
+    print("###############################")
 
-    return [summaryTable,fullTable]
+    if choice == 0:
+        summary = soup.find('div',id='all_scout_summary')
+        if summary == None :
+            return(f"No Summary scouting Report Available for {url.split('/')[-1]}")
+        else:
+            values = getTitles(summary)
+    else:
+        full = soup.find('div',id='all_scout_full')
+        if full == None:
+            return(f"No Full scouting Report Available for {url.split('/')[-1]}")
+        else:
+            values = getTitles(full)
+
+    return values
+    # return [summaryTable,fullTable]
 
 
 
@@ -93,12 +100,15 @@ def getData():
         players[url.split('/')[-1]] = scoutingReport(url)
 
 if __name__ == '__main__':
+    # Firstly get the players we have to search for from the user
     getPlayersFromUser()
+
+    # for each player we will fetch the data, either summary or full (userinput)
     getData()
     
-    
+    # we will use the returned players dict to create the visualisation 
 
-
-    print(players)
+    createChart(players)
+    # print(json.dumps(players))
 
 
