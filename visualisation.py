@@ -32,7 +32,6 @@ def charts(values:dict):
         os.mkdir("./results")
 
     for positions,players in grouped_data.items():
-        print(f"{' '.join(list(grouped_data.keys()))}  {' '.join(list(players.keys()))}")
         fig = make_subplots(rows = 1,
                             cols = 1,
                             x_title=f"{positions} || {' & '.join(list(players.keys()))}"
@@ -40,7 +39,8 @@ def charts(values:dict):
         for player,stats in players.items():
             fig.add_trace(createPolarCharts(stats, player), row=1, col=1)
         fig.update_layout(showlegend=True)
-        fig.write_image(f"./results/{today}_{'_&_'.join(list(players.keys()))}.png")
+        # f"./results/{today}_{positions.replace(' ','')}_{'_&_'.join(list(players.keys()))}.png"
+        fig.write_image(f"./results/{today}-{''.join(positions.split()).replace('/','-')}-{''.join(list(players.keys()))}.png")
 
 
 
