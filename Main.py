@@ -15,38 +15,46 @@ def scoutingReport(url):
     # Extract the player ID from the player URL
     playerID = url.split('/')[-2]
 
-    # Construct the scouting report URL
-    scoutingReportURL = f"https://fbref.com/en/players/{playerID}/scout/365_m1/{playerID}-Scouting-Report"
 
+    # TODO fix: The 365_m1 may not be same for every player
+    # Construct the scouting report URL
+    # scoutingReportURL = f"https://fbref.com/en/players/{playerID}/scout/365_m1/{playerID}-Scouting-Report"
+    scoutingReportURL = url
     response = requests.get(scoutingReportURL)
-    response.raise_for_status()
+    if response.status_code == 500:
+        return None 
 
     soup = BeautifulSoup(response.content,'html.parser')
-    
-    
-
-    print("###############################")
-    choice = int(input("Would you like  summary scouting (0) or full scouting report (1)? "))
-    print("###############################")
-
-    if choice == 0:
-        summary = soup.find('div',id='all_scout_summary')
-        if summary == None :
-            return(f"No Summary scouting Report Available for {url.split('/')[-1]}")
-        else:
-            values = getTitles(summary)
+    summary = soup.find('div',id='all_scout_summary')
+    if summary == None :
+        return {}
     else:
-        full = soup.find('div',id='all_scout_full')
-        if full == None:
-            return(f"No Full scouting Report Available for {url.split('/')[-1]}")
-        else:
-            values = getTitles(full)
+        values = getTitles(summary)
+
+    # questionString = (f"# Would you like summary scouting (0) or full scouting report (1)? for {url.split('/')[-1]} #")
+
+    # hash = '#'*len(questionString)
+    # print(hash)
+    # print(questionString)
+    # print(hash)
+
+
+    # # choice = int(input())
+
+    # if choice == 0:
+    #     summary = soup.find('div',id='all_scout_summary')
+    #     if summary == None :
+    #         return(f"No Summary scouting Report Available for {url.split('/')[-1]}")
+    #     else:
+    #         values = getTitles(summary)
+    # else:
+    #     full = soup.find('div',id='all_scout_full')
+    #     if full == None:
+    #         return(f"No Full scouting Report Available for {url.split('/')[-1]}")
+    #     else:
+    #         values = getTitles(full)
 
     return values
-    # return [summaryTable,fullTable]
-
-
-
 
 
 def searchFBRefPlayerByName(playerName):
@@ -73,9 +81,17 @@ def searchFBRefPlayerByName(playerName):
 
 
 def getPlayersFromUser():
-    playerName = input('Search for player: ')
+    p = "# Search for a player #"
+
+
+    print('#'*len(p))
+    print(p)
+    print('#'*len(p))
+    playerName = input()
+
     searchForPlayer = searchFBRefPlayerByName(playerName)
-    if type(searchForPlayer) == dict:
+
+    if type(searchForPlayer) == dict and len(searchForPlayer)>0:
         for key,val in searchForPlayer.items():
             print(f"{key}: {val['name']}")
        
@@ -85,8 +101,9 @@ def getPlayersFromUser():
             choice = int(input('Enter Number for player you want '))
         
         chosenPlayer = searchForPlayer[int(choice)]
+        print(f"Player url found: {chosenPlayer['url']} ... fetching data")
         allPlayerURLs.append(chosenPlayer['url'])
-    else:  
+    elif type(searchForPlayer) == str : 
         allPlayerURLs.append(searchForPlayer)
 
     addMorePlayers = input("Add more players to search? Y/N ").upper()
@@ -100,16 +117,18 @@ def getData():
         players[url.split('/')[-1]] = scoutingReport(url)
 
 if __name__ == '__main__':
-    # Firstly get the players we have to search for from the user
+    # TODO: Maybe allow there to be option to input URL instead of player names 
+    #  Firstly get the players we have to search for from the user
     getPlayersFromUser()
 
     # for each player we will fetch the data, either summary or full (userinput)
     getData()
     
-    # we will use the returned players dict to create the visualisation 
 
-    # TODO: when using full data instead of summary, create multiple charts for each subcategory
-    createChart(players)
+    # print(players)
+    # TODO: Consider Using the full data aswell where the subcategory average is calculated and used for each polar axis
+    charts(players)
 
 
+    
 

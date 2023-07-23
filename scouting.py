@@ -24,12 +24,15 @@
 
 
 
+from bs4 import BeautifulSoup
+
+
 def getScoutingTables(table):
     row_data = {}
     tbody = table.find('tbody')
 
     tbodyRows = tbody.find_all('tr')
-
+    # TODO: Can probably use enum here for the full scouting and just create averages using ideas from breakdownstatsfull() and averageStatForFullScouting() here instead of having the full 100+ stat
     for row in tbodyRows:
         # this will hold the dict for each thing  eg. {'xG:[<td>,<td>]}
         
@@ -54,7 +57,7 @@ def getScoutingTables(table):
         
     return row_data
 
-def getTitles(div):
+def getTitles(div:BeautifulSoup):
     titles = div.find('div',class_='filter switcher')
     atags = titles.findAll('a')
 
